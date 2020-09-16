@@ -1,0 +1,117 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<style>
+		body {
+			overflow	: hidden;
+			padding		: 0;
+			margin		: 0;
+			background-color: #BBB;
+		}
+		#info {
+			position	: absolute;
+			top		: 0px;
+			width		: 100%;
+			padding		: 5px;
+			text-align	: center;
+		}
+		#info a {
+			color		: #66F;
+			text-decoration	: none;
+		}
+		#info a:hover {
+			text-decoration	: underline;
+		}
+		#container {
+			width		: 100%;
+			height		: 100%;
+			overflow	: hidden;
+			padding		: 0;
+			margin		: 0;
+			-webkit-user-select	: none;
+			-moz-user-select	: none;
+		}
+		</style>
+
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			Touch the screen and move
+			<br/>
+			<span id="result"></span>
+			<span id="result2"></span>
+		</div> 
+		<script src="./virtualjoystick.js"></script>
+		<script>
+			console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+			// JoyStick1
+			var joystick2	= new VirtualJoystick({
+		container	: document.getElementById("container"),
+		strokeStyle	: 'cyan',
+		limitStickTravel: true,
+		stickRadius	: 120	
+	});
+	joystick2.addEventListener('touchStartValidation', function(event){
+		var touch	= event.changedTouches[0];
+		if( touch.pageX < window.innerWidth/2 )	return false;
+		return true
+	});
+	joystick2.addEventListener('touchStart', function(){
+		console.log('fire')
+	});
+			var prevX2 = 0;
+			var prevY2 = 0;
+			var newX2 = 0;
+			var newY2 = 0;
+			setInterval(function(){
+				var outputEl	= document.getElementById('result2');
+				newX2 = Math.round(joystick2.deltaX());
+				newY2 = Math.round(joystick2.deltaY()) * -1;
+				outputEl.innerHTML	= '<b>Position:</b> '
+					+ 'Cyan X: '+newX2
+					+ 'Cyan Y: '+newY2;
+
+				prevX2 = newX2;
+				prevY2 = newY2;
+			}, 1/30 * 1000);
+
+		// JoyStick2
+		var joystick	= new VirtualJoystick({
+		container	: document.getElementById("container"),
+		strokeStyle	: 'orange',
+		limitStickTravel: true,
+		stickRadius	: 120		
+	});
+	joystick.addEventListener('touchStartValidation', function(event){
+		var touch	= event.changedTouches[0];
+		if( touch.pageX >= window.innerWidth/2 )	return false;
+		return true
+	});
+	joystick.addEventListener('touchStart', function(){
+		console.log('fire')
+	})
+			var prevX = 0;
+			var prevY = 0;
+			var newX = 0;
+			var newY = 0;
+			setInterval(function(){
+				var outputEl	= document.getElementById('result');
+				newX = Math.round(joystick.deltaX());
+				newY = Math.round(joystick.deltaY()) * -1;
+				outputEl.innerHTML	= '<b>Position:</b> '
+					+ 'Orange X: '+newX
+					+ 'Orange Y: '+newY;
+				
+					var xhr = new XMLHttpRequest();
+					xhr.open('PUT', "./jsData.html?x="+newX+"&y="+newY+"&x2="+newX2+"&y2="+newY2)
+					xhr.send();
+				
+				prevX = newX;
+				prevY = newY;
+			}, 1/30 * 1000);
+		</script>
+	</body>
+</html>
